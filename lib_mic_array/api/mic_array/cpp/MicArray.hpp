@@ -243,7 +243,22 @@ namespace  mic_array {
 // Template function implementations below. //
 //////////////////////////////////////////////
 
+#define USE_TEST_SIGNAL 0 // DO NOT USE IF USE_BUTTONS == 1 and MIC_ARRAY_TILE == 0
 
+#if USE_TEST_SIGNAL
+// X0D12, J12 - Pin2
+#define INIT_TEST_SIGNAL()          \
+  uint32_t test_signal = 0;         \
+  port_t p_test_pin = XS1_PORT_1E;  \
+  port_enable(p_test_pin)
+
+#define TOGGLE_TEST_SIGNAL()        \
+  test_signal ^= 1;                 \
+  port_out(p_test_pin, test_signal)
+#else
+#define INIT_TEST_SIGNAL()
+#define TOGGLE_TEST_SIGNAL()
+#endif
 
 template <unsigned MIC_COUNT, 
           class TDecimator,
@@ -255,11 +270,16 @@ void mic_array::MicArray<MIC_COUNT,TDecimator,TPdmRx,
                                    TOutputHandler>::ThreadEntry()
 {
   int32_t sample_out[MIC_COUNT] = {0};
+  INIT_TEST_SIGNAL();
 
   while(1){
+    TOGGLE_TEST_SIGNAL();
     uint32_t* pdm_samples = PdmRx.GetPdmBlock();
+    TOGGLE_TEST_SIGNAL();
     Decimator.ProcessBlock(sample_out, pdm_samples);
+    TOGGLE_TEST_SIGNAL();
     SampleFilter.Filter(sample_out);
+    TOGGLE_TEST_SIGNAL();
     OutputHandler.OutputSample(sample_out);
   }
 }
