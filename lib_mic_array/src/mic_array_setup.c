@@ -51,7 +51,16 @@ void mic_array_pdm_clock_start(
 {
   if( pdm_res->clock_b != 0 ) {
     uint32_t tmp;
-    
+
+    //port_reset(XS1_PORT_1E); // X0D12
+    //port_reset(XS1_PORT_1G); // X0D22
+    //port_enable(XS1_PORT_1E);
+    //port_enable(XS1_PORT_1G);
+    //port_set_clock(XS1_PORT_1E, pdm_res->clock_a);
+    //port_set_clock(XS1_PORT_1G, pdm_res->clock_b);
+    //port_set_out_clock(XS1_PORT_1E);
+    //port_set_out_clock(XS1_PORT_1G);
+
     port_clear_buffer(pdm_res->p_pdm_mics);
     
     /* start the faster capture clock */
@@ -66,6 +75,12 @@ void mic_array_pdm_clock_start(
     /* start the slower output clock */
     clock_start(pdm_res->clock_a);
   } else {
+
+    //port_reset(XS1_PORT_1E); // X0D12
+    //port_enable(XS1_PORT_1E);
+    //port_set_clock(XS1_PORT_1E, pdm_res->clock_a);
+    //port_set_out_clock(XS1_PORT_1E);
+
     // You'd think that we could move the `clock_start(pdm_res->clock_a)` to be
     //  after the if..else block instead of duplicating it. But no, if I try 
     //  that, the compiler screws something up and the output audio is all 
